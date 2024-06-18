@@ -39,7 +39,7 @@ class LoadWidget:
                 imgui.end_popup()
 
             imgui.same_line()
-            imgui.text(self.ply.split("/")[-1])
+            imgui.text(self.ply.split("/")[-2] + " : " + self.ply.split("/")[-1].split("_")[-1].split(".")[0])
 
             rh_flag = self.ply.split("/")[-1].split("_")[0]
             if imgui_utils.button("Switch", width=viz.button_w, enabled=True):
@@ -50,7 +50,7 @@ class LoadWidget:
                     rh_flag = "rgb"
                     self.ply = self.ply.replace("hot_", "rgb_")
             imgui.same_line()
-            imgui.text(rh_flag)
+            imgui.text("current mode : " + rh_flag)
 
         viz.args.ply_file_path = self.ply
         viz.args.current_ply_name = self.ply.replace("/", "_").replace("\\", "_").replace(":", "_").replace(".", "_")
