@@ -25,7 +25,7 @@ class Visualizer(imgui_window.ImguiWindow):
     def __init__(self, data_path=None, use_gan_decoder=False):
         super().__init__(
             title="面向火灾场景的多源融合动态三维重建", window_width=1920, window_height=1080,
-            font="fonts/JetBrainsMono-Regular.ttf"
+            font="fonts/JetBrainsMono-ExtraBold.ttf"
         )
 
         # Internals.
