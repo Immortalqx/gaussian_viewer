@@ -39,7 +39,19 @@ class LoadWidget:
                 imgui.end_popup()
 
             imgui.same_line()
-            imgui.text(self.ply)
+            imgui.text(self.ply.split("/")[-1])
+
+            rh_flag = self.ply.split("/")[-1].split("_")[0]
+            if imgui_utils.button("Switch", width=viz.button_w, enabled=True):
+                if rh_flag == "rgb":
+                    rh_flag = "hot"
+                    self.ply = self.ply.replace("rgb_", "hot_")
+                else:
+                    rh_flag = "rgb"
+                    self.ply = self.ply.replace("hot_", "rgb_")
+            imgui.same_line()
+            imgui.text(rh_flag)
+
         viz.args.ply_file_path = self.ply
         viz.args.current_ply_name = self.ply.replace("/", "_").replace("\\", "_").replace(":", "_").replace(".", "_")
 
@@ -51,4 +63,4 @@ class LoadWidget:
                     current_path = os.path.join(root, file)
                     if all([filter in current_path for filter in self.filter.split(",")]):
                         self.items.append(current_path)
-        return self.items
+        return sorted(self.items)

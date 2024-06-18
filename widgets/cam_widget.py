@@ -36,7 +36,7 @@ class CamWidget:
         self.invert_y = False
         self.move_speed = 0.02
         self.control_modes = ["orbit", "free"]
-        self.current_control_mode = 0
+        self.current_control_mode = 1
 
     def drag(self, dx, dy):
         viz = self.viz
@@ -70,7 +70,8 @@ class CamWidget:
                 self.cam_pos += self.sideways * self.move_speed * multiply
 
         elif self.control_modes[self.current_control_mode] == "orbit":
-            self.cam_pos = get_origin(self.pose.yaw + np.pi / 2, self.pose.pitch + np.pi / 2, self.radius, self.lookat_point, device=torch.device("cuda"), up_vector=self.up_vector)
+            self.cam_pos = get_origin(self.pose.yaw + np.pi / 2, self.pose.pitch + np.pi / 2, self.radius,
+                                      self.lookat_point, device=torch.device("cuda"), up_vector=self.up_vector)
             self.forward = normalize_vecs(self.lookat_point - self.cam_pos)
             if imgui.is_key_down(imgui.get_key_index(imgui.KEY_A) + 22):  # W
                 self.pose.pitch -= self.move_speed
@@ -142,7 +143,6 @@ class CamWidget:
             _, self.invert_y = imgui.checkbox("invert y", self.invert_y)
 
         self.cam_params = create_cam2world_matrix(self.forward, self.cam_pos, self.up_vector).to("cuda")[0]
-
 
         viz.args.yaw = self.pose.yaw
         viz.args.pitch = self.pose.pitch

@@ -6,7 +6,6 @@ import sys
 
 sys.path.append("./gaussian-splatting")
 
-
 torch.set_printoptions(precision=2, sci_mode=False)
 np.set_printoptions(precision=2)
 
@@ -15,17 +14,18 @@ from gui_utils import imgui_utils
 from gui_utils import gl_utils
 from gui_utils import text_utils
 from viz_utils.dict import EasyDict
-from widgets import edit_widget, eval_widget, performance_widget, load_widget, video_widget, cam_widget, capture_widget, latent_widget
+from widgets import (edit_widget, eval_widget, performance_widget,
+                     load_widget, video_widget, cam_widget, capture_widget, latent_widget)
 from viz.async_renderer import AsyncRenderer
 from viz.gaussian_renderer import GaussianRenderer
 from viz.gaussian_decoder_renderer import GaussianDecoderRenderer
 
 
-
 class Visualizer(imgui_window.ImguiWindow):
     def __init__(self, data_path=None, use_gan_decoder=False):
         super().__init__(
-            title="Gaussian Machine", window_width=1920, window_height=1080, font="fonts/JetBrainsMono-Regular.ttf"
+            title="面向火灾场景的多源融合动态三维重建", window_width=1920, window_height=1080,
+            font="fonts/JetBrainsMono-Regular.ttf"
         )
 
         # Internals.
@@ -45,12 +45,14 @@ class Visualizer(imgui_window.ImguiWindow):
         # Widgets.
         self.load_widget = load_widget.LoadWidget(self, data_path)
         self.cam_widget = cam_widget.CamWidget(self)
-        self.latent_widget = latent_widget.LatentWidget(self)
         self.edit_widget = edit_widget.EditWidget(self)
         self.eval_widget = eval_widget.EvalWidget(self)
         self.perf_widget = performance_widget.PerformanceWidget(self)
-        self.video_widget = video_widget.VideoWidget(self)
-        self.capture_widget = capture_widget.CaptureWidget(self)
+
+        # 下面的组件不用了！
+        # self.latent_widget = latent_widget.LatentWidget(self)
+        # self.video_widget = video_widget.VideoWidget(self)
+        # self.capture_widget = capture_widget.CaptureWidget(self)
 
         # Initialize window.
         self.set_position(0, 0)
@@ -84,7 +86,7 @@ class Visualizer(imgui_window.ImguiWindow):
     def draw_frame(self):
         self.begin_frame()
         self.args = EasyDict()
-        self.pane_w = self.font_size * 50
+        self.pane_w = self.font_size * 30  # 这里调节成30比较好，但是渲染的图像大小却修改不了了
         self.button_w = self.font_size * 5
         self.label_w = round(self.font_size * 5.5)
 
@@ -110,16 +112,19 @@ class Visualizer(imgui_window.ImguiWindow):
         self.perf_widget(expanded)
         expanded, _visible = imgui_utils.collapsing_header("Camera", default=False)
         self.cam_widget(expanded)
-        if self.use_gan_decoder:
-            expanded, _visible = imgui_utils.collapsing_header("Latent", default=False)
-            self.latent_widget(expanded)
-        expanded, _visible = imgui_utils.collapsing_header("Video", default=False)
-        self.video_widget(expanded)
-        expanded, _visible = imgui_utils.collapsing_header("Save", default=False)
-        self.capture_widget(expanded)
-        expanded, _visible = imgui_utils.collapsing_header("Edit", default=True)
+
+        # 注释掉这些，不用这些东西
+        # if self.use_gan_decoder:
+        #     expanded, _visible = imgui_utils.collapsing_header("Latent", default=False)
+        #     self.latent_widget(expanded)
+        # expanded, _visible = imgui_utils.collapsing_header("Video", default=False)
+        # self.video_widget(expanded)
+        # expanded, _visible = imgui_utils.collapsing_header("Save", default=False)
+        # self.capture_widget(expanded)
+
+        expanded, _visible = imgui_utils.collapsing_header("Edit", default=False)
         self.edit_widget(expanded)
-        expanded, _visible = imgui_utils.collapsing_header("Eval", default=True)
+        expanded, _visible = imgui_utils.collapsing_header("Eval", default=False)
         self.eval_widget(expanded)
 
         # Render.
@@ -144,7 +149,8 @@ class Visualizer(imgui_window.ImguiWindow):
                     self._tex_obj = gl_utils.Texture(image=self._tex_img, bilinear=False, mipmap=False)
                 else:
                     self._tex_obj.update(self._tex_img)
-            zoom = min(max_w / self._tex_obj.width, max_h / self._tex_obj.height)
+            # zoom = min(max_w / self._tex_obj.width, max_h / self._tex_obj.height) # 这是填满高度
+            zoom = max(max_w / self._tex_obj.width, max_h / self._tex_obj.height)  # 这是填满宽度
             self._tex_obj.draw(pos=pos, zoom=zoom, align=0.5, rint=True)
         if "error" in self.result:
             self.print_error(self.result.error)
